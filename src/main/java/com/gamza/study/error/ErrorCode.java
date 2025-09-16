@@ -13,6 +13,7 @@ public enum ErrorCode {
 
     // 인증/인가 에러 (AUTH)
     UNAUTHORIZED(401, "AUTH-401", "인증이 필요합니다"),
+    UNAUTHORIZED_ACTION(403, "AUTH-403", "해당 작업에 권한이 없습니다."),
     INVALID_REFRESH_TOKEN(401, "AUTH-401", "유효하지 않은 리프레시 토큰입니다"),
     INVALID_ACCESS_TOKEN(401, "AUTH-401", "유효하지 않은 액세스 토큰입니다"),
     TOKEN_EXPIRED(401, "AUTH-401", "토큰이 만료되었습니다"),
@@ -29,7 +30,11 @@ public enum ErrorCode {
 
     //잔액 관련 에러
     INSUFFICIENT_BALANCE(400, "INSUFFICIENT-400", "잔액이 부족합니다."),
-    INSUFFICIENT_COIN_BALANCE(400, "INSUFFICIENT-400", "코인 잔액이 부족합니다.");
+    INSUFFICIENT_COIN_BALANCE(400, "INSUFFICIENT-400", "코인 잔액이 부족합니다."),
+
+    //주문 관련 에러
+    ORDER_NOT_FOUND(404, "ORDER-404", "주문을 찾을 수 없습니다."),
+    INVALID_ORDER_STATE(400, "ORDER-400","주문이 이미 체결되었거나 취소되어 취소 할 수 없습니다.");
 
     private int status;
     private String errorCode;

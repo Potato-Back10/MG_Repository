@@ -1,6 +1,7 @@
 package com.gamza.study.error;
 
 import com.gamza.study.error.customExceptions.InsufficientException;
+import com.gamza.study.error.customExceptions.OrderException;
 import com.gamza.study.error.customExceptions.UnauthorizedException;
 import com.gamza.study.error.customExceptions.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -76,11 +77,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    //POST 관련 예외 처리
+    //잔고 관련 예외 처리
     @ExceptionHandler(InsufficientException.class)
-    public ResponseEntity<ErrorResponse> handlePostNotFoundException(InsufficientException ex) {
+    public ResponseEntity<ErrorResponse> InsufficientException(InsufficientException ex) {
         log.error("Insufficient balance: {}", ex.getMessage(), ex);
         ErrorResponse response = new ErrorResponse(ex.getErrorCode());
         return new ResponseEntity<>(response, HttpStatus.valueOf(ex.getErrorCode().getStatus()));
     }
+
+    //Order 관련 예외 처리
+    @ExceptionHandler(InsufficientException.class)
+    public ResponseEntity<ErrorResponse> OrderException(OrderException ex) {
+        log.error("Order not found: {}", ex.getMessage(), ex);
+        ErrorResponse response = new ErrorResponse(ex.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(ex.getErrorCode().getStatus()));
+    }
+
 }

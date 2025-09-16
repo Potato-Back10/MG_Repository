@@ -1,6 +1,5 @@
 package com.gamza.study.dto.ResponseDTO;
 
-import com.gamza.study.entity.TradeOrderEntity;
 import com.gamza.study.entity.enums.OrderStatus;
 import com.gamza.study.entity.enums.OrderType;
 
@@ -13,13 +12,4 @@ public record OrderResponseDTO(
         OrderType orderType,
         OrderStatus orderStatus
 ) {
-    public static OrderResponseDTO fromEntity(TradeOrderEntity tradeOrderEntity){
-        return new OrderResponseDTO(
-                tradeOrderEntity.getId(),
-                tradeOrderEntity.getAmount(),
-                tradeOrderEntity.getPrice(),
-                tradeOrderEntity.getOrderType(),
-                tradeOrderEntity.getStatus()
-        );
-    }
 }
