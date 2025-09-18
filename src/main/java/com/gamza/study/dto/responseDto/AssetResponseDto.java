@@ -1,10 +1,9 @@
-package com.gamza.study.dto.ResponseDTO;
+package com.gamza.study.dto.responseDto;
 
 import java.math.BigDecimal;
 
-public record AssetResponseDTO(
+public record AssetResponseDto(
         Long userId,
         BigDecimal balance,
         BigDecimal coinBalance
-) {
-}
+) {}

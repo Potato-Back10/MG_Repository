@@ -1,6 +1,6 @@
 package com.gamza.study.service;
 
-import com.gamza.study.dto.RequestDTO.OrderRequestDTO;
+import com.gamza.study.dto.requestDto.OrderRequestDto;
 import com.gamza.study.entity.AssetEntity;
 import com.gamza.study.entity.TradeOrderEntity;
 import com.gamza.study.entity.enums.OrderStatus;
@@ -40,7 +40,7 @@ public class TradingServiceImpl implements TradingService{
 
     @Override
     @Transactional
-    public TradeOrderEntity createOrder(Long userId, OrderRequestDTO dto) {
+    public TradeOrderEntity createOrder(Long userId, OrderRequestDto dto) {
         AssetEntity asset = assetRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 

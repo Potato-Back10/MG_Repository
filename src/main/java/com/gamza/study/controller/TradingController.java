@@ -1,8 +1,7 @@
 package com.gamza.study.controller;
 
-import com.gamza.study.dto.RequestDTO.OrderRequestDTO;
-import com.gamza.study.dto.ResponseDTO.AssetResponseDTO;
-import com.gamza.study.dto.ResponseDTO.OrderResponseDTO;
+import com.gamza.study.dto.responseDto.*;
+import com.gamza.study.dto.requestDto.OrderRequestDto;
 import com.gamza.study.entity.TradeOrderEntity;
 import com.gamza.study.mapper.AssetMapper;
 import com.gamza.study.mapper.OrderMapper;
@@ -23,7 +22,7 @@ public class TradingController {
     private final AssetMapper assetMapper;
 
     @GetMapping("/{userId}/assets")
-    public ResponseEntity<AssetResponseDTO> getMyAssets(@PathVariable Long userId) {
+    public ResponseEntity<AssetResponseDto> getMyAssets(@PathVariable Long userId) {
         return tradingService.getMyAssets(userId)
                 .map(assetMapper::toDTO)
                 .map(ResponseEntity::ok)
@@ -31,16 +30,16 @@ public class TradingController {
     }
 
     @GetMapping("/{userId}/orders")
-    public ResponseEntity<List<OrderResponseDTO>> getMyOrders(@PathVariable Long userId) {
+    public ResponseEntity<List<OrderResponseDto>> getMyOrders(@PathVariable Long userId) {
         List<TradeOrderEntity> orders = tradingService.getMyOrders(userId);
-        return ResponseEntity.ok(orderMapper.OrderToDTOList(orders));
+        return ResponseEntity.ok(orderMapper.OrderToDtoList(orders));
     }
 
     @PostMapping("/{userId}/orders")
-    public ResponseEntity<OrderResponseDTO> createOrder(@PathVariable Long userId,
-                                                        @Valid @RequestBody OrderRequestDTO requestDto) {
+    public ResponseEntity<OrderResponseDto> createOrder(@PathVariable Long userId,
+                                                        @Valid @RequestBody OrderRequestDto requestDto) {
         TradeOrderEntity created = tradingService.createOrder(userId, requestDto);
-        return ResponseEntity.ok(orderMapper.OrderToDTO(created));
+        return ResponseEntity.ok(orderMapper.OrderToDto(created));
     }
 
     @DeleteMapping("/{userId}/orders/{orderId}")
