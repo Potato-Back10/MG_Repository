@@ -86,7 +86,7 @@ public class GlobalExceptionHandler {
     }
 
     //Order 관련 예외 처리
-    @ExceptionHandler(InsufficientException.class)
+    @ExceptionHandler(OrderException.class)
     public ResponseEntity<ErrorResponse> OrderException(OrderException ex) {
         log.error("Order not found: {}", ex.getMessage(), ex);
         ErrorResponse response = new ErrorResponse(ex.getErrorCode());
