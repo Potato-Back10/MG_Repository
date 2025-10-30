@@ -30,7 +30,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public JwtAuthenticationFilter(@Value("${jwt.secret}") String signingKey) {
         this.secretKey = Keys.hmacShaKeyFor(signingKey.getBytes(StandardCharsets.UTF_8));
-        //        this.secretKey = new SecretKeySpec(signingKey.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
     }
 
     @Override
@@ -39,7 +38,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         AntPathMatcher pathMatcher = new AntPathMatcher();
 
         // 특정 경로를 필터에서 제외
-        if (path.equals("/auth/login") || path.equals("/auth/signup") || path.equals("/auth/reissue") || pathMatcher.match("/swagger-ui.html", path) || pathMatcher.match("/swagger-ui/**", path) || pathMatcher.match("/v3/api-docs/**", path)) {
+        if (path.equals("/auth/login")
+                || path.equals("/auth/signup")
+                || path.equals("/auth/reissue")
+                || pathMatcher.match("/swagger-ui.html", path)
+                || pathMatcher.match("/swagger-ui/**", path)
+                || pathMatcher.match("/v3/api-docs/**", path)) {
             filterChain.doFilter(request, response);
             return;
         }
