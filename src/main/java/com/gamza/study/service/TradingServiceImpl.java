@@ -53,7 +53,8 @@ public class TradingServiceImpl implements TradingService{
             asset.deductCoin(dto.amount());
         }
 
-        TradeOrderEntity order = TradeOrderEntity.createPending(userId, dto.orderType(), dto.amount(), dto.price());
+        TradeOrderEntity order = TradeOrderEntity.createPending(
+                userId, dto.orderType(), dto.amount(), dto.price());
         assetRepository.save(asset);
         return tradeOrderRepository.save(order);
     }
@@ -64,8 +65,10 @@ public class TradingServiceImpl implements TradingService{
         TradeOrderEntity order = tradeOrderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(ErrorCode.ORDER_NOT_FOUND));
 
-        if (!order.getUserId().equals(userId)) throw new UnauthorizedException(ErrorCode.UNAUTHORIZED_ACTION);
-        if (order.getStatus() != OrderStatus.PENDING) throw new OrderException(ErrorCode.INVALID_ORDER_STATE);
+        if (!order.getUserId().equals(userId))
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED_ACTION);
+        if (order.getStatus() != OrderStatus.PENDING)
+            throw new OrderException(ErrorCode.INVALID_ORDER_STATE);
 
         AssetEntity asset = assetRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
