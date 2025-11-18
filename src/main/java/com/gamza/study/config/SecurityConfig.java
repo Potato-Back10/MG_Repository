@@ -1,7 +1,9 @@
 package com.gamza.study.config;
 
 import com.gamza.study.jwt.JwtAuthenticationFilter;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,6 +19,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Configuration
@@ -25,6 +28,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final SecretKey secretKey;
+
+    @Bean
+    public SecretKey jwtSecretKey(@Value("${jwt.secret}") String secret) {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
