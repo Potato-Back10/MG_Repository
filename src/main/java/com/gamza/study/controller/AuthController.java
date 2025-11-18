@@ -37,6 +37,7 @@ public class AuthController {
     public ResponseEntity<LoginDto> login(
             @RequestBody UserLoginRequestDto userLoginRequestDto,
             HttpServletResponse httpServletResponse) {
+
         LoginDto loginDto = userService.login(userLoginRequestDto, httpServletResponse);
         return ResponseEntity.ok(loginDto);
 

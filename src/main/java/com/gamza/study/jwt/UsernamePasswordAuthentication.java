@@ -5,7 +5,6 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
-
 public class UsernamePasswordAuthentication extends UsernamePasswordAuthenticationToken {
     public UsernamePasswordAuthentication(Object principal,
                                           Object credentials,

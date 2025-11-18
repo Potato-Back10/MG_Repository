@@ -4,7 +4,6 @@ import com.gamza.study.entity.enums.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,10 +37,10 @@ public class JwtUtil {
 
         // claim
         Claims claims = Jwts.claims();
-        claims.put("userId", userId);
-        claims.put("email", email);
+        claims.put(JwtConstants.CLAIM_USER_ID, userId);
+        claims.put(JwtConstants.CLAIM_EMAIL, email);
         if (role != null) {
-            claims.put("role", role.toString());
+            claims.put(JwtConstants.CLAIM_ROLE, role.toString());
         }
 
         return Jwts.builder()

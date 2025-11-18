@@ -2,50 +2,43 @@ package com.gamza.study.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private SecretKey secretKey;
+    private final SecretKey secretKey;
+    private final List<String> whiteList;
 
-    public JwtAuthenticationFilter(@Value("${jwt.secret}") String signingKey) {
-        this.secretKey = Keys.hmacShaKeyFor(signingKey.getBytes(StandardCharsets.UTF_8));
+    public JwtAuthenticationFilter(SecretKey secretKey, String[] whiteList) {
+        this.secretKey = secretKey;
+        this.whiteList = List.of(whiteList);
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
         AntPathMatcher pathMatcher = new AntPathMatcher();
 
-        // 특정 경로를 필터에서 제외
-        if (path.equals("/auth/login")
-                || path.equals("/auth/signup")
-                || path.equals("/auth/reissue")
-                || pathMatcher.match("/swagger-ui.html", path)
-                || pathMatcher.match("/swagger-ui/**", path)
-                || pathMatcher.match("/v3/api-docs/**", path)) {
-            filterChain.doFilter(request, response);
-            return;
+        for(String pattern : whiteList) {
+            if(pathMatcher.match(pattern, path)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
         }
 
         String jwt = request.getHeader("Authorization");
@@ -57,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 'Bearer ' 접두어를 제거하고 실제 JWT 토큰만 가져오기
-        jwt = jwt.substring(7);
+        jwt = jwt.substring(JwtConstants.TOKEN_PREFIX_LENGTH);
 
         // 토큰에서 클레임을 얻고 서명 검증.
         Claims claims = Jwts.parserBuilder()
@@ -66,10 +59,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .parseClaimsJws(jwt)
                 .getBody();
 
-        Number userIdNumber = (Number) claims.get("userId");
-        Long userId = userIdNumber.longValue();
-        String email = (String) claims.get("email");
-        String role = (String) claims.get("role");
+        long userId = ((Number) claims.get(JwtConstants.CLAIM_USER_ID)).longValue();
+        String email = (String) claims.get(JwtConstants.CLAIM_EMAIL);
+        String role = (String) claims.get(JwtConstants.CLAIM_ROLE);
+
 
         // SecurityContext 에 추가할 Authentication 인스턴스 생성
         List<GrantedAuthority> authorities = new ArrayList<>();
@@ -77,8 +70,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
         }
 
-//        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
-        CustomUserDetails userDetails = new CustomUserDetails(userId, claims.getSubject(), email, authorities);
+        CustomUserDetails userDetails = new CustomUserDetails(userId, email, role, authorities);
+
 
         UsernamePasswordAuthentication authentication = new UsernamePasswordAuthentication(userDetails, null, authorities);
 
