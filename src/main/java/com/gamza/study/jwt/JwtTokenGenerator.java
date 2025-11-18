@@ -2,37 +2,37 @@ package com.gamza.study.jwt;
 
 import com.gamza.study.entity.enums.Role;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 
 @Component
-@Slf4j
-public class JwtUtil {
+public class JwtTokenGenerator {
+
     private final SecretKey secretKey;
     private final Long accessExpMs;
     private final Long refreshExpMs;
+    private final Clock clock;
 
-    public JwtUtil(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.token.access-expiration-time}") Long access,
-            @Value("${jwt.token.refresh-expiration-time}") Long refresh) {
-        secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        accessExpMs = access;
-        refreshExpMs = refresh;
+    public JwtTokenGenerator(
+            SecretKey secretKey,
+            @Value("${jwt.token.access-expiration-time}") Long accessExpMs,
+            @Value("${jwt.token.refresh-expiration-time}") Long refreshExpMs,
+            Clock clock) {
+        this.secretKey = secretKey;
+        this.accessExpMs = accessExpMs;
+        this.refreshExpMs = refreshExpMs;
+        this.clock = clock;
     }
 
     public String createAccessToken(long userId, String email, Role role) {
-        Instant now = Instant.now();
+        Instant now = Instant.now(clock);
         Instant expiration = now.plusMillis(accessExpMs);
 
         // claim
@@ -59,39 +59,10 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
-                .addClaims(Map.of("userId", userId))
+                .addClaims(Map.of(JwtConstants.CLAIM_USER_ID, userId))
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(expiration))
                 .signWith(secretKey)
                 .compact();
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
-        } catch (JwtException e) {
-            return false;
-        }
-    }
-
-    public Long getUserId(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.get("userId", Long.class);
-    }
-
-    public String getEmail(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.get("email", String.class);
     }
 }

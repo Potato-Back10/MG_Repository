@@ -10,7 +10,8 @@ import com.gamza.study.entity.enums.Role;
 import com.gamza.study.error.ErrorCode;
 import com.gamza.study.error.customExceptions.UnauthorizedException;
 import com.gamza.study.error.customExceptions.UserNotFoundException;
-import com.gamza.study.jwt.JwtUtil;
+import com.gamza.study.jwt.JwtProvider;
+import com.gamza.study.jwt.JwtTokenGenerator;
 import com.gamza.study.mapper.AuthMapper;
 import com.gamza.study.repository.AuthRepository;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,9 +26,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final AuthRepository userRepository;
-    private final AuthMapper userMapper;
+    private final AuthMapper authMapper;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
+    private final JwtTokenGenerator jwtTokenGenerator;
 
     @Override
     public UserResponseDto signup(UserSignupRequestDto userSignupRequestDto) {
@@ -38,20 +40,20 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String encodedPassword = passwordEncoder.encode(userSignupRequestDto.password());
-        UserEntity userEntity = userMapper.toEntity(userSignupRequestDto, encodedPassword);
+        UserEntity userEntity = authMapper.toEntity(userSignupRequestDto, encodedPassword);
         userRepository.save(userEntity);
 
-        return userMapper.toResponseDto(userEntity);
+        return authMapper.toResponseDto(userEntity);
     }
 
     @Override
     public TokenResponseDto reissue(String refreshToken) {
-        if (!jwtUtil.validateToken(refreshToken)) {
+        if (!jwtProvider.validateToken(refreshToken)) {
             throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        Long userId = jwtUtil.getUserId(refreshToken);
-        String email = jwtUtil.getEmail(refreshToken);
+        Long userId = jwtProvider.getUserId(refreshToken);
+        String email = jwtProvider.getEmail(refreshToken);
         UserEntity userEntity = userRepository.findById(userId).orElse(null);
 
         Role role = null;
@@ -59,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
             role = userEntity.getRole();
         }
 
-        String newAccessToken = jwtUtil.createAccessToken(userId, email, role);
+        String newAccessToken = jwtTokenGenerator.createAccessToken(userId, email, role);
         return new TokenResponseDto(newAccessToken);
     }
 
@@ -81,8 +83,8 @@ public class AuthServiceImpl implements AuthService {
         Long userId = userEntity.getId();
         Role role = userEntity.getRole();
 
-        String accessToken = jwtUtil.createAccessToken(userId, email, role);
-        String refreshToken = jwtUtil.createRefreshToken(userId);
+        String accessToken = jwtTokenGenerator.createAccessToken(userId, email, role);
+        String refreshToken = jwtTokenGenerator.createRefreshToken(userId);
 
         httpServletResponse.setHeader("Authorization", "Bearer " + accessToken);
 
