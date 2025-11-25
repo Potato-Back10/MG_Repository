@@ -28,7 +28,7 @@ public class JwtProvider {
 
     public String getEmail(String token) {
         Claims claims = jwtParser.parseClaims(token);
-        return claims.get(JwtConstants.CLAIM_EMAIL, String.class);
+        return claims.get(JwtConstants.CLAIM_USERNAME, String.class);
     }
 
 }

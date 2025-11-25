@@ -22,11 +22,11 @@ public enum ErrorCode {
     // 사용자 관련 에러 (USER)
     USER_NOT_FOUND(404, "USER-404", "사용자를 찾을 수 없습니다"),
     DUPLICATE_USER(409, "USER-409", "이미 존재하는 사용자입니다"),
-    DUPLICATE_EMAIL(409, "USER-409", "이미 등록된 이메일입니다. 다른 이메일을 사용해주세요"),
-    INVALID_EMAIL_VERIFICATION_CODE(401, "USER-401", "유효하지 않은 이메일 인증 코드입니다"),
+    DUPLICATE_PHONE(409, "USER-409", "이미 등록된 전화번호입니다. 다른 전화번호을 사용해주세요"),
+    INVALID_PHONE_VERIFICATION_CODE(401, "USER-401", "유효하지 않은 전화번호 인증 코드입니다"),
     INVALID_FRIEND_CODE(404, "USER-404", "유효하지 않은 친구 코드입니다."),
-    EMAIL_CODE_TIMEOUT(410, "USER-410", "이메일 인증 코드가 만료되었습니다"),
-    EMAIL_VERIFICATION_REQUEST_NOT_FOUND(400, "USER-400", "이메일 인증 요청을 찾을 수 없습니다"),
+    VERIFY_CODE_TIMEOUT(410, "USER-410", "전화번호 인증 코드가 만료되었습니다"),
+    PHONE_VERIFICATION_REQUEST_NOT_FOUND(400, "USER-400", "전화번호 인증 요청을 찾을 수 없습니다"),
 
     //잔액 관련 에러
     INSUFFICIENT_BALANCE(400, "INSUFFICIENT-400", "잔액이 부족합니다."),

@@ -4,7 +4,6 @@ import com.gamza.study.dto.LoginDto;
 import com.gamza.study.dto.requestDto.UserLoginRequestDto;
 import com.gamza.study.dto.requestDto.UserSignupRequestDto;
 import com.gamza.study.dto.responseDto.TokenResponseDto;
-import com.gamza.study.dto.responseDto.UserResponseDto;
 import com.gamza.study.entity.UserEntity;
 import com.gamza.study.entity.enums.Role;
 import com.gamza.study.error.ErrorCode;
@@ -32,18 +31,17 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenGenerator jwtTokenGenerator;
 
     @Override
-    public UserResponseDto signup(UserSignupRequestDto userSignupRequestDto) {
-        String email = userSignupRequestDto.email();
+    public void signup(UserSignupRequestDto userSignupRequestDto) {
+        String loginId = userSignupRequestDto.loginId();
 
-        if (userRepository.existsByEmail(email)) {
-            throw new UserNotFoundException(ErrorCode.DUPLICATE_EMAIL);
+        if (userRepository.existsByLoginId(loginId)) {
+            throw new UserNotFoundException(ErrorCode.DUPLICATE_USER);
         }
 
         String encodedPassword = passwordEncoder.encode(userSignupRequestDto.password());
         UserEntity userEntity = authMapper.toEntity(userSignupRequestDto, encodedPassword);
         userRepository.save(userEntity);
 
-        return authMapper.toResponseDto(userEntity);
     }
 
     @Override
@@ -70,20 +68,21 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginDto login(UserLoginRequestDto userLoginRequestDto,HttpServletResponse httpServletResponse) {
-        String email = userLoginRequestDto.email();
+        String loginId = userLoginRequestDto.loginId();
         String password = userLoginRequestDto.password();
 
-        UserEntity userEntity = userRepository.findByEmail(email)
+        UserEntity userEntity = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(password, userEntity.getPassword())) {
             throw new UnauthorizedException(ErrorCode.INVALID_PASSWORD);
         }
 
-        Long userId = userEntity.getId();
+        long userId = userEntity.getId();
+        String username = userEntity.getUsername();
         Role role = userEntity.getRole();
 
-        String accessToken = jwtTokenGenerator.createAccessToken(userId, email, role);
+        String accessToken = jwtTokenGenerator.createAccessToken(userId, username, role);
         String refreshToken = jwtTokenGenerator.createRefreshToken(userId);
 
         httpServletResponse.setHeader("Authorization", "Bearer " + accessToken);

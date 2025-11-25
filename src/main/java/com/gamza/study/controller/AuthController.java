@@ -4,10 +4,10 @@ import com.gamza.study.dto.LoginDto;
 import com.gamza.study.dto.requestDto.UserLoginRequestDto;
 import com.gamza.study.dto.requestDto.UserSignupRequestDto;
 import com.gamza.study.dto.responseDto.TokenResponseDto;
-import com.gamza.study.dto.responseDto.UserResponseDto;
 import com.gamza.study.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,20 +15,22 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
-    private final AuthService userService;
+    private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDto> signup(
+    public ResponseEntity<Void> signup(
             @RequestBody UserSignupRequestDto userSignupRequestDto) {
 
-        return ResponseEntity.ok(userService.signup(userSignupRequestDto));
+        authService.signup(userSignupRequestDto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/reissue")
     public ResponseEntity<TokenResponseDto> reissue(
             @CookieValue("refreshToken") String refreshToken) {
 
-        TokenResponseDto tokenResponseDto = userService.reissue(refreshToken);
+        TokenResponseDto tokenResponseDto = authService.reissue(refreshToken);
 
         return ResponseEntity.ok(tokenResponseDto);
     }
@@ -38,7 +40,7 @@ public class AuthController {
             @RequestBody UserLoginRequestDto userLoginRequestDto,
             HttpServletResponse httpServletResponse) {
 
-        LoginDto loginDto = userService.login(userLoginRequestDto, httpServletResponse);
+        LoginDto loginDto = authService.login(userLoginRequestDto, httpServletResponse);
         return ResponseEntity.ok(loginDto);
 
     }

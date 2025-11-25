@@ -10,7 +10,8 @@ public class SecurityWhiteList {
             "/api-docs/**",
             "/auth/signup",
             "/auth/login",
-            "/auth/reissue"
+            "/auth/reissue",
+            "/api/auth/check_login_id"
     };
 
 }
