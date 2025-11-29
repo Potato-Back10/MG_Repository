@@ -14,6 +14,7 @@ public interface AuthMapper {
                 .phoneNumber(dto.phoneNumber())
                 .gender(dto.gender())
                 .birthDate(dto.birthDate())
+                .verify(dto.vertified())
                 .build();
     }
 

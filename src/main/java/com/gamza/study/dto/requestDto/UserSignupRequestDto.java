@@ -10,5 +10,6 @@ public record UserSignupRequestDto(
         String username,
         String phoneNumber,
         Gender gender,
-        Date birthDate
+        Date birthDate,
+        boolean vertified
 ) {}
