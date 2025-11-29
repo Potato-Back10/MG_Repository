@@ -37,6 +37,8 @@ public class UserEntity {
 
     private Date birthDate;
 
+    private boolean verify;
+
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
