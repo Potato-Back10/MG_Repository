@@ -30,7 +30,7 @@ public class MessageServiceImpl implements MessageService{
         Message message = new Message();
         message.setFrom(senderNumber);
         message.setTo(phoneNumber);
-        message.setText("[MindBridge] 인증번호 [" + code + "] 를 입력해주세요.");
+        message.setText("[GamzaFrontStudy] 인증번호 [" + code + "] 를 입력해주세요.");
 
         messageService.sendOne(new SingleMessageSendingRequest(message));
 
